@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KAYS GOLD — XAU/USD Signals</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #D4AF37;
+    --gold-light: #F0D060;
+    --gold-dim: #8B6914;
+    --bg: #080808;
+    --bg2: #0f0f0f;
+    --bg3: #161616;
+    --green: #00E676;
+    --red: #FF1744;
+    --text: #E8E0D0;
+    --muted: #555;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; min-height: 100vh; overflow-x: hidden; }
+  header { padding: 24px 20px 0; display: flex; justify-content: space-between; align-items: flex-start; }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 4px; color: var(--gold); line-height: 1; }
+  .logo span { display: block; font-size: 0.65rem; letter-spacing: 6px; color: var(--gold-dim); font-family: 'DM Mono', monospace; font-weight: 300; margin-top: 2px; }
+  .status-dot { display: flex; align-items: center; gap: 8px; font-size: 0.65rem; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-top: 6px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+  .dot.offline { background: var(--red); animation: none; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+  .price-section { padding: 28px 20px 0; }
+  .price-label { font-size: 0.6rem; letter-spacing: 4px; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 6px; }
+  .price-main { font-family: 'Bebas Neue', sans-serif; font-size: 4rem; color: var(--gold-light); line-height: 1; letter-spacing: 2px; transition: color 0.3s; }
+  .price-main.up { color: var(--green); }
+  .price-main.down { color: var(--red); }
+  .price-change { font-size: 0.75rem; margin-top: 6px; letter-spacing: 1px; }
+  .price-change.pos { color: var(--green); }
+  .price-change.neg { color: var(--red); }
+  .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--gold-dim), transparent); margin: 24px 20px; opacity: 0.4; }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin: 0 20px; background: var(--bg3); border: 1px solid #1e1e1e; }
+  .stat-box { background: var(--bg2); padding: 14px 12px; text-align: center; }
+  .stat-label { font-size: 0.55rem; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+  .stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; color: var(--gold); letter-spacing: 1px; }
+  .signal-section { margin: 20px; }
+  .signal-card { border: 1px solid #1e1e1e; background: var(--bg2); padding: 20px; position: relative; overflow: hidden; }
+  .signal-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--gold); transition: background 0.4s; }
+  .signal-card.buy::before { background: var(--green); }
+  .signal-card.sell::before { background: var(--red); }
+  .signal-card.neutral::before { background: var(--gold-dim); }
+  .signal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .signal-title { font-size: 0.6rem; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
+  .signal-time { font-size: 0.6rem; color: var(--muted); letter-spacing: 1px; }
+  .signal-type { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; letter-spacing: 4px; line-height: 1; transition: color 0.4s; }
+  .signal-type.BUY { color: var(--green); }
+  .signal-type.SELL { color: var(--red); }
+  .signal-type.WAIT { color: var(--gold-dim); }
+  .signal-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #1e1e1e; }
+  .detail-item .d-label { font-size: 0.55rem; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+  .detail-item .d-value { font-size: 0.85rem; color: var(--text); letter-spacing: 1px; }
+  .indicators-section { margin: 0 20px 20px; }
+  .section-title { font-size: 0.55rem; letter-spacing: 4px; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 12px; }
+  .indicator-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #141414; }
+  .indicator-row:last-child { border-bottom: none; }
+  .ind-name { font-size: 0.7rem; color: var(--muted); letter-spacing: 1px; }
+  .ind-badge { font-size: 0.6rem; letter-spacing: 2px; padding: 3px 8px; border: 1px solid currentColor; text-transform: uppercase; }
+  .badge-bull { color: var(--green); }
+  .badge-bear { color: var(--red); }
+  .badge-neu { color: var(--gold-dim); }
+  .history-section { margin: 0 20px 30px; }
+  .history-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #111; }
+  .history-item:last-child { border-bottom: none; }
+  .h-type { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 2px; width: 45px; }
+  .h-type.BUY { color: var(--green); }
+  .h-type.SELL { color: var(--red); }
+  .h-info { flex: 1; }
+  .h-price { font-size: 0.75rem; color: var(--text); letter-spacing: 1px; }
+  .h-time { font-size: 0.6rem; color: var(--muted); letter-spacing: 1px; margin-top: 2px; }
+  .h-result { font-size: 0.7rem; letter-spacing: 1px; }
+  .h-result.win { color: var(--green); }
+  .h-result.loss { color: var(--red); }
+  .h-result.open { color: var(--gold-dim); }
+  footer { padding: 16px 20px 30px; text-align: center; font-size: 0.55rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #111; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="logo">KAYS GOLD<span>XAU/USD · SIGNAL DASHBOARD</span></div>
+  </div>
+  <div>
+    <div class="status-dot">
+      <div class="dot" id="statusDot"></div>
+      <span id="statusText">LIVE</span>
+    </div>
+  </div>
+</header>
+<div class="price-section">
+  <div class="price-label">PRIX ACTUEL — XAU/USD</div>
+  <div class="price-main" id="priceMain">—</div>
+  <div class="price-change" id="priceChange">Chargement...</div>
+</div>
+<div class="divider"></div>
+<div class="stats-row">
+  <div class="stat-box"><div class="stat-label">EMA 20</div><div class="stat-value" id="ema20">—</div></div>
+  <div class="stat-box"><div class="stat-label">EMA 50</div><div class="stat-value" id="ema50">—</div></div>
+  <div class="stat-box"><div class="stat-label">RSI 14</div><div class="stat-value" id="rsiVal">—</div></div>
+</div>
+<div class="signal-section">
+  <div class="signal-card neutral" id="signalCard">
+    <div class="signal-header">
+      <div class="signal-title">Signal actif</div>
+      <div class="signal-time" id="signalTime">--:--</div>
+    </div>
+    <div class="signal-type WAIT" id="signalType">WAIT</div>
+    <div class="signal-details">
+      <div class="detail-item"><div class="d-label">Entrée</div><div class="d-value" id="entryPrice">—</div></div>
+      <div class="detail-item"><div class="d-label">Stop Loss</div><div class="d-value" id="slPrice" style="color:var(--red)">—</div></div>
+      <div class="detail-item"><div class="d-label">Take Profit</div><div class="d-value" id="tpPrice" style="color:var(--green)">—</div></div>
+    </div>
+  </div>
+</div>
+<div class="indicators-section">
+  <div class="section-title">Indicateurs</div>
+  <div class="indicator-row"><span class="ind-name">Tendance EMA</span><span class="ind-badge badge-neu" id="emaTrend">NEUTRE</span></div>
+  <div class="indicator-row"><span class="ind-name">RSI</span><span class="ind-badge badge-neu" id="rsiBadge">NEUTRE</span></div>
+  <div class="indicator-row"><span class="ind-name">Session</span><span class="ind-badge badge-neu" id="sessionBadge">—</span></div>
+  <div class="indicator-row"><span class="ind-name">Dernière MAJ</span><span class="ind-value" id="lastUpdate" style="color:var(--muted); font-size:0.65rem">—</span></div>
+</div>
+<div class="history-section">
+  <div class="section-title">Historique signaux</div>
+  <div id="historyList"><div style="font-size:0.65rem; color:var(--muted); padding:12px 0;">En attente du premier signal...</div></div>
+</div>
+<footer>KAYS GOLD EA · Stratégie EMA/RSI/ATR · 1% risque max</footer>
+<script>
+const SERVER_URL = 'https://kays-gold-server.onrender.com/signal';
+const UPDATE_INTERVAL = 30000;
+let signalHistory = [];
+let prevPrice = null;
+
+async function fetchSignal() {
+  try {
+    const res = await fetch(SERVER_URL);
+    const data = await res.json();
+    if(data && data.signal) {
+      updateFromServer(data);
+      setOnline(true);
+    }
+  } catch(e) {
+    setOnline(false);
+  }
+}
+
+function updateFromServer(data) {
+  const price = parseFloat(data.price) || 0;
+  const sl = parseFloat(data.sl) || 0;
+  const tp = parseFloat(data.tp) || 0;
+  const signal = data.signal || 'WAIT';
+
+  document.getElementById('priceMain').textContent = price.toFixed(2);
+  if(prevPrice !== null) {
+    const diff = price - prevPrice;
+    const pct = (diff / prevPrice * 100).toFixed(3);
+    document.getElementById('priceMain').className = 'price-main ' + (diff >= 0 ? 'up' : 'down');
+    document.getElementById('priceChange').textContent = (diff >= 0 ? '▲ +' : '▼ ') + diff.toFixed(2) + ' (' + (diff >= 0 ? '+' : '') + pct + '%)';
+    document.getElementById('priceChange').className = 'price-change ' + (diff >= 0 ? 'pos' : 'neg');
+  }
+  prevPrice = price;
+
+  const typeEl = document.getElementById('signalType');
+  typeEl.textContent = signal;
+  typeEl.className = 'signal-type ' + signal;
+
+  const card = document.getElementById('signalCard');
+  card.className = 'signal-card ' + (signal === 'BUY' ? 'buy' : signal === 'SELL' ? 'sell' : 'neutral');
+
+  document.getElementById('entryPrice').textContent = price > 0 ? price.toFixed(2) : '—';
+  document.getElementById('slPrice').textContent = sl > 0 ? sl.toFixed(2) : '—';
+  document.getElementById('tpPrice').textContent = tp > 0 ? tp.toFixed(2) : '—';
+
+  const now = new Date();
+  document.getElementById('signalTime').textContent = now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+  document.getElementById('lastUpdate').textContent = now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+
+  const sessionEl = document.getElementById('sessionBadge');
+  const utcHour = now.getUTCHours();
+  if(utcHour >= 7 && utcHour < 22) { sessionEl.textContent = 'ACTIVE'; sessionEl.className = 'ind-badge badge-bull'; }
+  else { sessionEl.textContent = 'FERMÉE'; sessionEl.className = 'ind-badge badge-bear'; }
+}
+
+function setOnline(online) {
+  document.getElementById('statusDot').className = 'dot' + (online ? '' : ' offline');
+  document.getElementById('statusText').textContent = online ? 'LIVE' : 'HORS LIGNE';
+}
+
+fetchSignal();
+setInterval(fetchSignal, UPDATE_INTERVAL);
+</script>
+</body>
+</html>

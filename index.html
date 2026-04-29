@@ -139,52 +139,50 @@ let prevPrice = null;
 
 async function fetchSignal() {
   try {
-    const res = await fetch(SERVER_URL);
-    const data = await res.json();
-    if(data && data.signal) {
-      updateFromServer(data);
+    // Récupère le vrai prix depuis Twelve Data
+    const priceRes = await fetch(
+      `https://api.twelvedata.com/price?symbol=XAU/USD&apikey=${API_KEY}`
+    );
+    const priceData = await priceRes.json();
+
+    // Récupère le dernier signal depuis le serveur Render
+    const signalRes = await fetch(SERVER_URL);
+    const signalData = await signalRes.json();
+
+    if(priceData.price) {
+      const price = parseFloat(priceData.price);
+      const sl = parseFloat(signalData.sl) || 0;
+      const tp = parseFloat(signalData.tp) || 0;
+      const signal = signalData.signal || 'WAIT';
+
+      document.getElementById('priceMain').textContent = price.toFixed(2);
+      document.getElementById('priceMain').className = 'price-main';
+
+      const typeEl = document.getElementById('signalType');
+      typeEl.textContent = signal;
+      typeEl.className = 'signal-type ' + signal;
+
+      const card = document.getElementById('signalCard');
+      card.className = 'signal-card ' + (signal === 'BUY' ? 'buy' : signal === 'SELL' ? 'sell' : 'neutral');
+
+      document.getElementById('entryPrice').textContent = price > 0 ? price.toFixed(2) : '—';
+      document.getElementById('slPrice').textContent = sl > 0 ? sl.toFixed(2) : '—';
+      document.getElementById('tpPrice').textContent = tp > 0 ? tp.toFixed(2) : '—';
+
+      const now = new Date();
+      document.getElementById('signalTime').textContent = now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+      document.getElementById('lastUpdate').textContent = now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+
+      const utcHour = now.getUTCHours();
+      const sessionEl = document.getElementById('sessionBadge');
+      if(utcHour >= 7 && utcHour < 22) { sessionEl.textContent = 'ACTIVE'; sessionEl.className = 'ind-badge badge-bull'; }
+      else { sessionEl.textContent = 'FERMÉE'; sessionEl.className = 'ind-badge badge-bear'; }
+
       setOnline(true);
     }
   } catch(e) {
     setOnline(false);
   }
-}
- 
-function updateFromServer(data) {
-  const price = parseFloat(data.price) || 0;
-  const sl = parseFloat(data.sl) || 0;
-  const tp = parseFloat(data.tp) || 0;
-  const signal = data.signal || 'WAIT';
-
-  document.getElementById('priceMain').textContent = price.toFixed(2);
-  if(prevPrice !== null) {
-    const diff = price - prevPrice;
-    const pct = (diff / prevPrice * 100).toFixed(3);
-    document.getElementById('priceMain').className = 'price-main ' + (diff >= 0 ? 'up' : 'down');
-    document.getElementById('priceChange').textContent = (diff >= 0 ? '▲ +' : '▼ ') + diff.toFixed(2) + ' (' + (diff >= 0 ? '+' : '') + pct + '%)';
-    document.getElementById('priceChange').className = 'price-change ' + (diff >= 0 ? 'pos' : 'neg');
-  }
-  prevPrice = price;
-
-  const typeEl = document.getElementById('signalType');
-  typeEl.textContent = signal;
-  typeEl.className = 'signal-type ' + signal;
-
-  const card = document.getElementById('signalCard');
-  card.className = 'signal-card ' + (signal === 'BUY' ? 'buy' : signal === 'SELL' ? 'sell' : 'neutral');
-
-  document.getElementById('entryPrice').textContent = price > 0 ? price.toFixed(2) : '—';
-  document.getElementById('slPrice').textContent = sl > 0 ? sl.toFixed(2) : '—';
-  document.getElementById('tpPrice').textContent = tp > 0 ? tp.toFixed(2) : '—';
-
-  const now = new Date();
-  document.getElementById('signalTime').textContent = now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
-  document.getElementById('lastUpdate').textContent = now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
-
-  const sessionEl = document.getElementById('sessionBadge');
-  const utcHour = now.getUTCHours();
-  if(utcHour >= 7 && utcHour < 22) { sessionEl.textContent = 'ACTIVE'; sessionEl.className = 'ind-badge badge-bull'; }
-  else { sessionEl.textContent = 'FERMÉE'; sessionEl.className = 'ind-badge badge-bear'; }
 }
 
 function setOnline(online) {

@@ -137,7 +137,18 @@
 <footer>KAYS GOLD EA · Stratégie EMA/RSI/ATR · 1% risque max</footer>
 <script>
 const SERVER_URL = 'https://kays-gold-server.onrender.com/signal';
-const API_KEY = '782f494ab03d447cb496bfb515dc94fd';
+let API_KEY = '';
+
+// Récupère la clé API depuis le serveur sécurisé
+async function loadApiKey() {
+  try {
+    const res = await fetch('https://kays-gold-server.onrender.com/apikey');
+    const data = await res.json();
+    API_KEY = data.key;
+  } catch(e) {
+    console.log('Erreur clé API');
+  }
+}
 const UPDATE_INTERVAL = 30000;
 let priceHistory = [];
 let labels = [];

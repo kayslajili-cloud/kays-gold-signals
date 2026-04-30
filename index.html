@@ -247,8 +247,10 @@ function setOnline(online) {
   document.getElementById('statusText').textContent = online ? 'LIVE' : 'HORS LIGNE';
 }
 
-fetchSignal();
-setInterval(fetchSignal, UPDATE_INTERVAL);
+  loadApiKey().then(() => {
+  fetchSignal();
+  setInterval(fetchSignal, UPDATE_INTERVAL);
+});
 </script>
 </body>
 </html>
